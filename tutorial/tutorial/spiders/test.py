@@ -14,15 +14,14 @@ class MySpider(scrapy.Spider):
         global pageNumber
         pageNumber = pageNumber + 1
         for title in response.css('p.title'):
-            check = response.css('span.domain a::attr(href)').extract()
-            link = title.css('a::attr(href)').extract() #link
+            check = response.css('span.domain a::attr(href)')[0].extract()
+            link = title.css('a::attr(href)')[0].extract() #link
             if check == '/domain/i.redd.it/': #if the check equals a link to reddit
                 link = response.urljoin(link) #join urls
                 
             yield {
                 'title' : title.css('a::text\n\n')[0].extract(),
-                'url' : link[0],
-                #'url' : title.css('a::attr(href)\n\n')[0].extract(),
+                'url' : link,
                 'pageNumber' : pageNumber,
                 }
             
