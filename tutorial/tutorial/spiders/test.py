@@ -9,26 +9,23 @@ class MySpider(scrapy.Spider):
     
     global pageNumber
     pageNumber = 0
-    
+
     def parse(self, response):
         global pageNumber
         pageNumber = pageNumber + 1
-        for title in response.css('p.title'):               
+        for title in response.css('p.title'):
+            check = response.css('span.domain a::attr(href)').extract()
+            link = title.css('a::attr(href)').extract() #link
+            if check == '/domain/i.redd.it/': #if the check equals a link to reddit
+                link = response.urljoin(link) #join urls
+                
             yield {
-                'title' : title.css('a::text\n').extract(),
-                'url' : title.css('a::attr(href)\n')[0].extract(),
+                'title' : title.css('a::text\n\n')[0].extract(),
+                'url' : link[0],
+                #'url' : title.css('a::attr(href)\n\n')[0].extract(),
                 'pageNumber' : pageNumber,
                 }
             
         next_page = response.css('span.next-button a::attr(href)').extract_first()
         yield response.follow(next_page, callback=self.parse)
             
-            
-"""    def link_check(x, y):
-    link = y.css('a::attr(href)\n')[1].extract() #link
-    if x == '/domain/i.redd.it/': #if the check equals a link to reddit
-        reddit_link = response.urljoin(link) #join urls
-        return reddit_link #return it
-    else:
-        return link #return just the normal link, leads to somewhere else          
-"""
